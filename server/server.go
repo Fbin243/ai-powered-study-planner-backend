@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"time"
 
-	"ai-powered-study-planner-backend/internal/db"
+	"ai-powered-study-planner-backend/db"
 
 	_ "github.com/joho/godotenv/autoload"
 )

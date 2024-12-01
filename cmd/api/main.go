@@ -9,7 +9,7 @@ import (
 	"syscall"
 	"time"
 
-	"ai-powered-study-planner-backend/internal/server"
+	"ai-powered-study-planner-backend/server"
 )
 
 func gracefulShutdown(apiServer *http.Server, done chan bool) {
@@ -37,7 +37,6 @@ func gracefulShutdown(apiServer *http.Server, done chan bool) {
 }
 
 func main() {
-
 	server := server.NewServer()
 
 	// Create a done channel to signal when the shutdown is complete
