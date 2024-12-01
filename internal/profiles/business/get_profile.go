@@ -3,7 +3,7 @@ package business
 import (
 	"context"
 
-	"ai-powered-study-planner-backend/internal/profiles/repo"
+	"ai-powered-study-planner-backend/internal/profiles/entity"
 	"ai-powered-study-planner-backend/pkg/auth"
 	"ai-powered-study-planner-backend/pkg/db"
 	"ai-powered-study-planner-backend/pkg/errors"
@@ -11,23 +11,13 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-type ProfileBusiness struct {
-	ProfilesRepo *repo.ProfilesRepo
-}
-
-func NewProfileBusiness(profilesRepo *repo.ProfilesRepo) *ProfileBusiness {
-	return &ProfileBusiness{
-		ProfilesRepo: profilesRepo,
-	}
-}
-
-func (b *ProfileBusiness) GetProfile(ctx context.Context) (*repo.Profile, error) {
+func (b *profilesBusiness) GetProfile(ctx context.Context) (*entity.Profile, error) {
 	firebaseProfile, ok := ctx.Value(auth.ProfileKey).(*auth.FirebaseProfile)
 	if !ok {
 		return nil, errors.ErrUserUnauthorized
 	}
 
-	var profile *repo.Profile
+	var profile *entity.Profile
 	// Check if the profile already exists
 	profile, err := b.ProfilesRepo.FindByFirebaseUID(firebaseProfile.UID)
 	if err != nil && err != mongo.ErrNoDocuments {
@@ -36,7 +26,7 @@ func (b *ProfileBusiness) GetProfile(ctx context.Context) (*repo.Profile, error)
 
 	// Create a new profile if it doesn't exist
 	if err == mongo.ErrNoDocuments {
-		profile = &repo.Profile{
+		profile = &entity.Profile{
 			BaseModel:   &db.BaseModel{},
 			FirebaseUID: firebaseProfile.UID,
 			Email:       firebaseProfile.Email,

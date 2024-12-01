@@ -1,4 +1,4 @@
-package repo
+package entity
 
 import "ai-powered-study-planner-backend/pkg/db"
 

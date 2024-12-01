@@ -1,19 +1,19 @@
 package server
 
 import (
-	"fmt"
-	"log"
 	"net/http"
-	"time"
+
+	"ai-powered-study-planner-backend/internal/profiles/composer"
+	"ai-powered-study-planner-backend/pkg/middlewares"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-
-	"github.com/coder/websocket"
 )
 
 func (s *Server) RegisterRoutes() http.Handler {
 	r := gin.Default()
+	authMiddleware := middlewares.NewAuthMiddleware()
+	profilesApi := composer.ComposeProfilesAPI()
 
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"http://localhost:5173"}, // Add your frontend URL
@@ -23,12 +23,9 @@ func (s *Server) RegisterRoutes() http.Handler {
 	}))
 
 	r.GET("/", s.HelloWorldHandler)
-
 	r.GET("/health", s.healthHandler)
-
-	r.Use(s.authMiddleware.CheckAuth)
-	r.GET("/profile", s.GetProfile)
-	r.GET("/websocket", s.websocketHandler)
+	r.Use(authMiddleware.CheckAuth)
+	r.GET("/profile", profilesApi.GetProfile)
 
 	return r
 }
@@ -40,42 +37,6 @@ func (s *Server) HelloWorldHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, resp)
 }
 
-func (s *Server) GetProfile(c *gin.Context) {
-	profile, err := s.profilesBusiness.GetProfile(c.Request.Context())
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusOK, profile)
-}
-
 func (s *Server) healthHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, s.db.Health())
-}
-
-func (s *Server) websocketHandler(c *gin.Context) {
-	w := c.Writer
-	r := c.Request
-	socket, err := websocket.Accept(w, r, nil)
-	if err != nil {
-		log.Printf("could not open websocket: %v", err)
-		_, _ = w.Write([]byte("could not open websocket"))
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	defer socket.Close(websocket.StatusGoingAway, "server closing websocket")
-
-	ctx := r.Context()
-	socketCtx := socket.CloseRead(ctx)
-
-	for {
-		payload := fmt.Sprintf("server timestamp: %d", time.Now().UnixNano())
-		err := socket.Write(socketCtx, websocket.MessageText, []byte(payload))
-		if err != nil {
-			break
-		}
-		time.Sleep(time.Second * 2)
-	}
 }

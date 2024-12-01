@@ -4,7 +4,6 @@ go 1.23.3
 
 require (
 	firebase.google.com/go v3.13.0+incompatible
-	github.com/coder/websocket v1.8.12
 	github.com/gin-contrib/cors v1.7.2
 	github.com/gin-gonic/gin v1.10.0
 	github.com/joho/godotenv v1.5.1
