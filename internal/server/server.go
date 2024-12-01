@@ -7,15 +7,15 @@ import (
 	"strconv"
 	"time"
 
-	_ "github.com/joho/godotenv/autoload"
+	"ai-powered-study-planner-backend/internal/db"
 
-	"ai-powered-study-planner-backend/internal/database"
+	_ "github.com/joho/godotenv/autoload"
 )
 
 type Server struct {
 	port int
 
-	db database.Service
+	db db.Service
 }
 
 func NewServer() *http.Server {
@@ -23,7 +23,7 @@ func NewServer() *http.Server {
 	NewServer := &Server{
 		port: port,
 
-		db: database.New(),
+		db: db.New(),
 	}
 
 	// Declare Server config

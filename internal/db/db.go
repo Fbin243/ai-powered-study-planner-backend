@@ -1,4 +1,4 @@
-package database
+package db
 
 import (
 	"context"
@@ -21,17 +21,19 @@ type service struct {
 }
 
 var (
-	host = os.Getenv("BLUEPRINT_DB_HOST")
-	port = os.Getenv("BLUEPRINT_DB_PORT")
-	//database = os.Getenv("BLUEPRINT_DB_DATABASE")
+	host     = os.Getenv("DB_HOST")
+	username = os.Getenv("DB_USERNAME")
+	password = os.Getenv("DB_PASSWORD")
+	database = os.Getenv("DB_DATABASE")
 )
 
 func New() Service {
-	client, err := mongo.Connect(context.Background(), options.Client().ApplyURI(fmt.Sprintf("mongodb://%s:%s", host, port)))
+	connectionString := fmt.Sprintf("mongodb+srv://%s:%s@%s/?retryWrites=true&w=majority&appName=%s", username, password, host, database)
+	client, err := mongo.Connect(context.Background(), options.Client().ApplyURI(connectionString))
+	log.Printf("connection string %s", connectionString)
 
 	if err != nil {
 		log.Fatal(err)
-
 	}
 	return &service{
 		db: client,
@@ -39,7 +41,7 @@ func New() Service {
 }
 
 func (s *service) Health() map[string]string {
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	err := s.db.Ping(ctx, nil)
