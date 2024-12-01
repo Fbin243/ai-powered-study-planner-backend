@@ -1,13 +1,13 @@
 package api
 
 import (
-	"fmt"
 	"net/http"
 
 	"ai-powered-study-planner-backend/internal/profiles/transport/dto"
 	"ai-powered-study-planner-backend/pkg/errors"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 )
 
 func (api *api) UpdateProfile(c *gin.Context) {
@@ -17,7 +17,11 @@ func (api *api) UpdateProfile(c *gin.Context) {
 		return
 	}
 
-	fmt.Print("user: ", user)
+	validate := validator.New()
+	if err := validate.Struct(user); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 
 	profile, err := api.ProfileBusiness.UpdateProfile(c.Request.Context(), &user)
 	if err != nil {
