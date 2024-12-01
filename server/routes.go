@@ -26,7 +26,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r.GET("/health", s.healthHandler)
 	r.Use(authMiddleware.CheckAuth)
 	r.GET("/profile", profilesApi.GetProfile)
-
+	r.POST("/profile", profilesApi.UpdateProfile)
 	return r
 }
 

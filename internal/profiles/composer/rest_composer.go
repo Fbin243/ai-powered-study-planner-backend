@@ -11,6 +11,7 @@ import (
 
 type ProfilesAPI interface {
 	GetProfile(c *gin.Context)
+	UpdateProfile(c *gin.Context)
 }
 
 func ComposeProfilesAPI() ProfilesAPI {

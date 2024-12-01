@@ -56,7 +56,7 @@ func (r *BaseRepo[M]) Insert(m *M) (*M, error) {
 	_m.SetCreatedAtByNow()
 	_m.SetUpdatedAtByNow()
 
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	_, err := r.Collection.InsertOne(ctx, m)
@@ -68,7 +68,7 @@ func (r *BaseRepo[M]) Insert(m *M) (*M, error) {
 }
 
 func (r *BaseRepo[M]) FindById(ID primitive.ObjectID) (*M, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	var result M
@@ -81,7 +81,7 @@ func (r *BaseRepo[M]) FindById(ID primitive.ObjectID) (*M, error) {
 }
 
 func (r *BaseRepo[M]) UpdateById(ID primitive.ObjectID, m *M) (*M, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	_m := *m
@@ -96,7 +96,7 @@ func (r *BaseRepo[M]) UpdateById(ID primitive.ObjectID, m *M) (*M, error) {
 }
 
 func (r *BaseRepo[M]) DeleteById(ID primitive.ObjectID) (*M, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	var result M
