@@ -44,7 +44,7 @@ type BaseRepo[M IBaseModel] struct {
 	collection *mongo.Collection
 }
 
-func NewBaseRepo[M IBaseModel](collection *mongo.Collection) IBaseRepo[M] {
+func NewBaseRepo[M IBaseModel](collection *mongo.Collection) *BaseRepo[M] {
 	return &BaseRepo[M]{
 		collection: collection,
 	}

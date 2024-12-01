@@ -1,10 +1,9 @@
 package server
 
 import (
-	"net/http"
-
 	"fmt"
 	"log"
+	"net/http"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -27,6 +26,8 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 	r.GET("/health", s.healthHandler)
 
+	r.Use(s.authMiddleware.CheckAuth)
+	r.GET("/profile", s.GetProfile)
 	r.GET("/websocket", s.websocketHandler)
 
 	return r
@@ -39,6 +40,16 @@ func (s *Server) HelloWorldHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, resp)
 }
 
+func (s *Server) GetProfile(c *gin.Context) {
+	profile, err := s.profilesBusiness.GetProfile(c.Request.Context())
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, profile)
+}
+
 func (s *Server) healthHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, s.db.Health())
 }
@@ -47,7 +58,6 @@ func (s *Server) websocketHandler(c *gin.Context) {
 	w := c.Writer
 	r := c.Request
 	socket, err := websocket.Accept(w, r, nil)
-
 	if err != nil {
 		log.Printf("could not open websocket: %v", err)
 		_, _ = w.Write([]byte("could not open websocket"))
