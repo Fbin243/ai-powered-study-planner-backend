@@ -11,8 +11,8 @@ import (
 
 type BaseModel struct {
 	ID        primitive.ObjectID `json:"id" bson:"_id"`
-	CreatedAt time.Time          `json:"created_at" bson:"created_at"`
-	UpdatedAt time.Time          `json:"updated_at" bson:"updated_at"`
+	CreatedAt time.Time          `json:"createdAt" bson:"created_at"`
+	UpdatedAt time.Time          `json:"updatedAt" bson:"updated_at"`
 }
 
 type IBaseModel interface {
@@ -41,12 +41,12 @@ type IBaseRepo[M IBaseModel] interface {
 }
 
 type BaseRepo[M IBaseModel] struct {
-	collection *mongo.Collection
+	Collection *mongo.Collection
 }
 
 func NewBaseRepo[M IBaseModel](collection *mongo.Collection) *BaseRepo[M] {
 	return &BaseRepo[M]{
-		collection: collection,
+		Collection: collection,
 	}
 }
 
@@ -59,7 +59,7 @@ func (r *BaseRepo[M]) Insert(m *M) (*M, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
 
-	_, err := r.collection.InsertOne(ctx, m)
+	_, err := r.Collection.InsertOne(ctx, m)
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +72,7 @@ func (r *BaseRepo[M]) FindById(ID primitive.ObjectID) (*M, error) {
 	defer cancel()
 
 	var result M
-	err := r.collection.FindOne(ctx, bson.M{"_id": ID}).Decode(&result)
+	err := r.Collection.FindOne(ctx, bson.M{"_id": ID}).Decode(&result)
 	if err != nil {
 		return nil, err
 	}
@@ -87,7 +87,7 @@ func (r *BaseRepo[M]) UpdateById(ID primitive.ObjectID, m *M) (*M, error) {
 	_m := *m
 	_m.SetUpdatedAtByNow()
 
-	_, err := r.collection.ReplaceOne(ctx, bson.M{"_id": ID}, _m)
+	_, err := r.Collection.ReplaceOne(ctx, bson.M{"_id": ID}, _m)
 	if err != nil {
 		return nil, err
 	}
@@ -100,7 +100,7 @@ func (r *BaseRepo[M]) DeleteById(ID primitive.ObjectID) (*M, error) {
 	defer cancel()
 
 	var result M
-	err := r.collection.FindOneAndDelete(ctx, bson.M{"_id": ID}).Decode(&result)
+	err := r.Collection.FindOneAndDelete(ctx, bson.M{"_id": ID}).Decode(&result)
 	if err != nil {
 		return nil, err
 	}

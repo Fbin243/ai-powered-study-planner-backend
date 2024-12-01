@@ -5,7 +5,10 @@ import (
 
 	"ai-powered-study-planner-backend/internal/profiles/repo"
 	"ai-powered-study-planner-backend/pkg/auth"
+	"ai-powered-study-planner-backend/pkg/db"
 	"ai-powered-study-planner-backend/pkg/errors"
+
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type ProfileBusiness struct {
@@ -24,11 +27,27 @@ func (b *ProfileBusiness) GetProfile(ctx context.Context) (*repo.Profile, error)
 		return nil, errors.ErrUserUnauthorized
 	}
 
-	profile := &repo.Profile{
-		Name:        firebaseProfile.Name,
-		Email:       firebaseProfile.Email,
-		FirebaseUID: firebaseProfile.UID,
-		Picture:     firebaseProfile.Picture,
+	var profile *repo.Profile
+	// Check if the profile already exists
+	profile, err := b.ProfilesRepo.FindByFirebaseUID(firebaseProfile.UID)
+	if err != nil && err != mongo.ErrNoDocuments {
+		return nil, err
+	}
+
+	// Create a new profile if it doesn't exist
+	if err == mongo.ErrNoDocuments {
+		profile = &repo.Profile{
+			BaseModel:   &db.BaseModel{},
+			FirebaseUID: firebaseProfile.UID,
+			Email:       firebaseProfile.Email,
+			Name:        firebaseProfile.Name,
+			Picture:     firebaseProfile.Picture,
+		}
+
+		profile, err = b.ProfilesRepo.Insert(profile)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return profile, nil
