@@ -11,7 +11,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func (b *profilesBusiness) GetProfile(ctx context.Context) (*entity.Profile, error) {
+func (b *ProfilesBusiness) GetProfile(ctx context.Context) (*entity.Profile, error) {
 	firebaseProfile, ok := ctx.Value(auth.ProfileKey).(*auth.FirebaseProfile)
 	if !ok {
 		return nil, errors.ErrUserUnauthorized

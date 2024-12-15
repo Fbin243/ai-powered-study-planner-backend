@@ -7,12 +7,12 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-type profilesRepo struct {
+type ProfilesRepo struct {
 	*db.BaseRepo[entity.Profile]
 }
 
-func NewProfilesRepo(collection *mongo.Collection) *profilesRepo {
-	return &profilesRepo{
+func NewProfilesRepo(collection *mongo.Collection) *ProfilesRepo {
+	return &ProfilesRepo{
 		db.NewBaseRepo[entity.Profile](collection),
 	}
 }

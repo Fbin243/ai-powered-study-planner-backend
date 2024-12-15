@@ -1,29 +1,28 @@
 package api
 
 import (
-	"net/http"
-
-	"ai-powered-study-planner-backend/internal/profiles/transport/dto"
+	"ai-powered-study-planner-backend/internal/tasks/transport/dto"
 	"ai-powered-study-planner-backend/pkg/errors"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 )
 
-func (api *ProfilesAPI) UpdateProfile(c *gin.Context) {
-	var user dto.UpdateProfileDto
-	if err := c.ShouldBindJSON(&user); err != nil {
+func (api *TasksAPI) UpsertTask(c *gin.Context) {
+	var task dto.TaskDto
+	if err := c.ShouldBindJSON(&task); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	validate := validator.New()
-	if err := validate.Struct(user); err != nil {
+	if err := validate.Struct(task); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	profile, err := api.ProfileBusiness.UpdateProfile(c.Request.Context(), &user)
+	upsertTask, err := api.TasksBusiness.UpsertTask(c.Request.Context(), &task)
 	if err != nil {
 		if err == errors.ErrUserUnauthorized {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
@@ -34,5 +33,5 @@ func (api *ProfilesAPI) UpdateProfile(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, profile)
+	c.JSON(http.StatusOK, upsertTask)
 }

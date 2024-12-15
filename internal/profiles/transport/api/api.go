@@ -1,23 +1,13 @@
 package api
 
-import (
-	"context"
+import "ai-powered-study-planner-backend/internal/profiles/business"
 
-	"ai-powered-study-planner-backend/internal/profiles/entity"
-	"ai-powered-study-planner-backend/internal/profiles/transport/dto"
-)
-
-type ProfilesBusiness interface {
-	GetProfile(ctx context.Context) (*entity.Profile, error)
-	UpdateProfile(ctx context.Context, input *dto.UpdateProfileDto) (*entity.Profile, error)
+type ProfilesAPI struct {
+	ProfileBusiness *business.ProfilesBusiness
 }
 
-type api struct {
-	ProfileBusiness ProfilesBusiness
-}
-
-func NewAPI(profileBusiness ProfilesBusiness) *api {
-	return &api{
+func NewProfilesAPI(profileBusiness *business.ProfilesBusiness) *ProfilesAPI {
+	return &ProfilesAPI{
 		ProfileBusiness: profileBusiness,
 	}
 }

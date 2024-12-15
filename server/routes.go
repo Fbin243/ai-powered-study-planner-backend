@@ -4,6 +4,8 @@ import (
 	"net/http"
 
 	"ai-powered-study-planner-backend/internal/profiles/composer"
+	tasksComposer "ai-powered-study-planner-backend/internal/tasks/composer"
+
 	"ai-powered-study-planner-backend/pkg/middlewares"
 
 	"github.com/gin-contrib/cors"
@@ -14,6 +16,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r := gin.Default()
 	authMiddleware := middlewares.NewAuthMiddleware()
 	profilesApi := composer.ComposeProfilesAPI()
+	tasksApi := tasksComposer.ComposeTasksAPI()
 
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"http://localhost:5173"}, // Add your frontend URL
@@ -25,8 +28,14 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r.GET("/", s.HelloWorldHandler)
 	r.GET("/health", s.healthHandler)
 	r.Use(authMiddleware.CheckAuth)
+	// Profiles
 	r.GET("/profile", profilesApi.GetProfile)
 	r.POST("/profile", profilesApi.UpdateProfile)
+	// Tasks
+	r.GET("/tasks", tasksApi.GetTasks)
+	r.GET("/tasks/:id", tasksApi.GetTask)
+	r.POST("/tasks", tasksApi.UpsertTask)
+	r.DELETE("/tasks/:id", tasksApi.DeleteTask)
 	return r
 }
 

@@ -9,7 +9,7 @@ import (
 	"ai-powered-study-planner-backend/pkg/errors"
 )
 
-func (b *profilesBusiness) UpdateProfile(ctx context.Context, input *dto.UpdateProfileDto) (*entity.Profile, error) {
+func (b *ProfilesBusiness) UpdateProfile(ctx context.Context, input *dto.UpdateProfileDto) (*entity.Profile, error) {
 	firebaseProfile, ok := ctx.Value(auth.ProfileKey).(*auth.FirebaseProfile)
 	if !ok {
 		return nil, errors.ErrUserUnauthorized

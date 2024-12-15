@@ -1,23 +1,15 @@
 package business
 
 import (
-	"ai-powered-study-planner-backend/internal/profiles/entity"
-
-	"go.mongodb.org/mongo-driver/bson/primitive"
+	"ai-powered-study-planner-backend/internal/profiles/repo"
 )
 
-type ProfilesRepo interface {
-	Insert(profile *entity.Profile) (*entity.Profile, error)
-	UpdateById(ID primitive.ObjectID, profile *entity.Profile) (*entity.Profile, error)
-	FindByFirebaseUID(firebaseUID string) (*entity.Profile, error)
+type ProfilesBusiness struct {
+	ProfilesRepo *repo.ProfilesRepo
 }
 
-type profilesBusiness struct {
-	ProfilesRepo ProfilesRepo
-}
-
-func NewProfileBusiness(profilesRepo ProfilesRepo) *profilesBusiness {
-	return &profilesBusiness{
+func NewProfileBusiness(profilesRepo *repo.ProfilesRepo) *ProfilesBusiness {
+	return &ProfilesBusiness{
 		ProfilesRepo: profilesRepo,
 	}
 }
