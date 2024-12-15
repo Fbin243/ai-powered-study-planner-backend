@@ -41,11 +41,11 @@ jobs:
     needs: build
     runs-on: self-hosted
     steps:
-      - name: Pull docker image
-        run: docker pull fbin243/awp:latest
       - name: Stop the running container
         run: docker stop awp-container
       - name: Prune docker system
         run: docker system prune -a -f
+      - name: Pull docker image
+        run: docker pull fbin243/awp:latest
       - name: Run docker container
         run: docker run -d -p 8080:8080 --name awp-container fbin243/awp:latest
