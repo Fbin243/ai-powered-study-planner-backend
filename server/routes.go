@@ -3,6 +3,7 @@ package server
 import (
 	"net/http"
 
+	llmsComposer "ai-powered-study-planner-backend/internal/llms/composer"
 	"ai-powered-study-planner-backend/internal/profiles/composer"
 	tasksComposer "ai-powered-study-planner-backend/internal/tasks/composer"
 
@@ -17,6 +18,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 	authMiddleware := middlewares.NewAuthMiddleware()
 	profilesApi := composer.ComposeProfilesAPI()
 	tasksApi := tasksComposer.ComposeTasksAPI()
+	llmsApi := llmsComposer.ComposeLLMsAPI()
 
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"*"},
@@ -36,6 +38,8 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r.GET("/tasks/:id", tasksApi.GetTask)
 	r.POST("/tasks", tasksApi.UpsertTask)
 	r.DELETE("/tasks/:id", tasksApi.DeleteTask)
+	// LLMs
+	r.GET("/llms/tasks", llmsApi.AnalyzeScheduledTasks)
 	return r
 }
 
