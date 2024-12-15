@@ -23,6 +23,8 @@ jobs:
           FIREBASE_ADMIN=${{secrets.FIREBASE_ADMIN}}
           FIREBASE_WEB_API_KEY=${{secrets.FIREBASE_WEB_API_KEY}}
           EOF
+      - name: Set up Firebase Admin JSON
+        run: echo "${{ secrets.FIREBASE_ADMIN_JSON }}" > firebase-admin.json
       - name: Login to docker hub
         uses: docker/login-action@v2
         with:
