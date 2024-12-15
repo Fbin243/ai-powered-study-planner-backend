@@ -43,7 +43,9 @@ jobs:
     steps:
       - name: Pull docker image
         run: docker pull fbin243/awp:latest
-      - name: Delete old container
-        run: docker rm -f awp-container || true
+      - name: Stop the running container
+        run: docker stop awp-container
+      - name: Prune docker system
+        run: docker system prune -a -f
       - name: Run docker container
         run: docker run -d -p 8080:8080 --name awp-container fbin243/awp:latest
