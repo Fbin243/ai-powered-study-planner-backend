@@ -59,4 +59,11 @@ watch:
             fi; \
         fi
 
+token:
+	@echo "Generating token..."
+	@go run cmd/main.go jwt
+
+llm:
+	@echo "Start LLM conversation..."
+	@go run internal/llms/main.go
 .PHONY: all build run test clean watch docker-run docker-down itest

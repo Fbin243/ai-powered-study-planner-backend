@@ -30,4 +30,5 @@ const (
 	NotStarted TaskStatus = "not_started"
 	InProgress TaskStatus = "in_progress"
 	Completed  TaskStatus = "completed"
+	Expired    TaskStatus = "expired"
 )
