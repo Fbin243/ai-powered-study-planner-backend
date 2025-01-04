@@ -35,10 +35,10 @@ var (
 )
 
 const (
-	ProfilesCollection     = "profiles"
-	TasksCollection        = "tasks"
-	TimeTrackingCollection = "time_trackings"
-	AnalyticsCollection    = "analytics"
+	ProfilesCollection   = "profiles"
+	TasksCollection      = "tasks"
+	TimeTracksCollection = "time_tracks"
+	AnalyticsCollection  = "analytics"
 )
 
 func New() Service {

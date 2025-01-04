@@ -56,7 +56,7 @@ func (b *LLMsBusiness) Chat(question string) *string {
 			return nil
 		}
 
-		fmt.Printf(response.Choices[0].Delta.Content)
+		fmt.Printf("%s", response.Choices[0].Delta.Content)
 		result += response.Choices[0].Delta.Content
 	}
 }

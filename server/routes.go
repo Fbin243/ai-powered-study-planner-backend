@@ -6,6 +6,7 @@ import (
 	llmsComposer "ai-powered-study-planner-backend/internal/llms/composer"
 	"ai-powered-study-planner-backend/internal/profiles/composer"
 	tasksComposer "ai-powered-study-planner-backend/internal/tasks/composer"
+	timetracksComposer "ai-powered-study-planner-backend/internal/timetracks/composer"
 
 	"ai-powered-study-planner-backend/pkg/middlewares"
 
@@ -19,6 +20,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 	profilesApi := composer.ComposeProfilesAPI()
 	tasksApi := tasksComposer.ComposeTasksAPI()
 	llmsApi := llmsComposer.ComposeLLMsAPI()
+	timetracksApi := timetracksComposer.ComposeTimetracksAPI()
 
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"*"},
@@ -40,6 +42,8 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r.DELETE("/tasks/:id", tasksApi.DeleteTask)
 	// LLMs
 	r.GET("/llms/tasks", llmsApi.AnalyzeScheduledTasks)
+	// Timetracks
+	r.POST("/timetracks", timetracksApi.UpsertTimetrack)
 	return r
 }
 

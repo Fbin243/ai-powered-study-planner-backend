@@ -18,7 +18,6 @@ func (b *TasksBusiness) UpsertTask(ctx context.Context, task *dto.TaskDto) (*ent
 	}
 
 	var upsertTask *entity.Task
-	var err error
 	if task.ID != "" {
 		oid, err := primitive.ObjectIDFromHex(task.ID)
 		if err != nil {
@@ -57,6 +56,7 @@ func (b *TasksBusiness) UpsertTask(ctx context.Context, task *dto.TaskDto) (*ent
 			StartDate:   task.StartDate,
 		}
 
+		var err error
 		upsertTask, err = b.TasksRepo.Insert(taskEntity)
 		if err != nil {
 			return nil, err
