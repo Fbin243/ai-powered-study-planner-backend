@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 func (b *TimetracksBusiness) UpsertTimetrack(ctx context.Context, timetrack *dto.TimeTrackDto) (*entity.Timetrack, error) {
@@ -72,6 +73,16 @@ func (b *TimetracksBusiness) UpsertTimetrack(ctx context.Context, timetrack *dto
 			return nil, fmt.Errorf("task is not in progress")
 		}
 
+		// Check if there is an active session
+		currentTimetrack, err := b.TimetracksRepo.GetCurrentTimetrack(firebaseProfile.UID)
+		if err != nil && err != mongo.ErrNoDocuments {
+			return nil, err
+		}
+
+		if currentTimetrack != nil {
+			return nil, fmt.Errorf("there is an current active session")
+		}
+
 		timetrackEntity := &entity.Timetrack{
 			BaseModel:   &db.BaseModel{},
 			FirebaseUID: firebaseProfile.UID,
@@ -87,4 +98,18 @@ func (b *TimetracksBusiness) UpsertTimetrack(ctx context.Context, timetrack *dto
 	}
 
 	return upsertTimetrack, nil
+}
+
+func (b *TimetracksBusiness) GetCurrentTimetrack(ctx context.Context) (*entity.Timetrack, error) {
+	firebaseProfile, ok := ctx.Value(auth.ProfileKey).(*auth.FirebaseProfile)
+	if !ok {
+		return nil, errors.ErrUserUnauthorized
+	}
+
+	currentTimetrack, err := b.TimetracksRepo.GetCurrentTimetrack(firebaseProfile.UID)
+	if err == mongo.ErrNoDocuments {
+		return nil, nil
+	}
+
+	return currentTimetrack, err
 }

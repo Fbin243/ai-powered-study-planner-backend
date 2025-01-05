@@ -3,6 +3,7 @@ package server
 import (
 	"net/http"
 
+	analyticsComposer "ai-powered-study-planner-backend/internal/analytics/composer"
 	llmsComposer "ai-powered-study-planner-backend/internal/llms/composer"
 	"ai-powered-study-planner-backend/internal/profiles/composer"
 	tasksComposer "ai-powered-study-planner-backend/internal/tasks/composer"
@@ -21,6 +22,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 	tasksApi := tasksComposer.ComposeTasksAPI()
 	llmsApi := llmsComposer.ComposeLLMsAPI()
 	timetracksApi := timetracksComposer.ComposeTimetracksAPI()
+	analyticsApi := analyticsComposer.ComposeAnalyticsAPI()
 
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"*"},
@@ -43,7 +45,10 @@ func (s *Server) RegisterRoutes() http.Handler {
 	// LLMs
 	r.GET("/llms/tasks", llmsApi.AnalyzeScheduledTasks)
 	// Timetracks
+	r.GET("/timetracks", timetracksApi.GetCurrentTimetrack)
 	r.POST("/timetracks", timetracksApi.UpsertTimetrack)
+	// Analytics
+	r.GET("/analytics", analyticsApi.GetAnalytics)
 	return r
 }
 

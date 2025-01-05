@@ -17,7 +17,7 @@ func (b *LLMsBusiness) AnalyzeScheduledTasks(ctx context.Context) (*string, erro
 	}
 
 	// Get all tasks of users
-	tasks, err := b.TasksRepo.GetTasksByFirebaseUID(firebaseProfile.UID)
+	tasks, err := b.TasksRepo.GetTasksByFirebaseUID(firebaseProfile.UID, nil, nil)
 	if err != nil {
 		return nil, nil
 	}

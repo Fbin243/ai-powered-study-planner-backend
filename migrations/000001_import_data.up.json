@@ -1,0 +1,15 @@
+[
+  {
+    "insert": "users",
+    "documents": [
+      {
+        "fullname": "John Doe",
+        "email": "john.doe@example.com"
+      },
+      {
+        "fullname": "Jane Smith",
+        "email": "jane.smith@example.com"
+      }
+    ]
+  }
+]

@@ -15,7 +15,7 @@ func (b *TasksBusiness) GetTasks(ctx context.Context) ([]entity.Task, error) {
 		return nil, errors.ErrUserUnauthorized
 	}
 
-	return b.TasksRepo.GetTasksByFirebaseUID(firebaseProfile.UID)
+	return b.TasksRepo.GetTasksByFirebaseUID(firebaseProfile.UID, nil, nil)
 }
 
 func (b *TasksBusiness) GetTaskByID(ctx context.Context, taskID string) (*entity.Task, error) {
