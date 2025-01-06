@@ -23,9 +23,11 @@ jobs:
           FIREBASE_ADMIN=${{secrets.FIREBASE_ADMIN}}
           FIREBASE_WEB_API_KEY=${{secrets.FIREBASE_WEB_API_KEY}}
           OPENAI_API_KEY=${{secrets.OPENAI_API_KEY}}
+          REDIS_URI=${{secrets.REDIS_URI}}
+          REDIS_PASSWORD=${{secrets.REDIS_PASSWORD}}
           EOF
       - name: Set up Firebase Admin JSON
-        run: |     
+        run: |
           cat <<EOF | base64 --decode > firebase-admin.json
           ${{ secrets.FIREBASE_ADMIN_JSON }}
           EOF
