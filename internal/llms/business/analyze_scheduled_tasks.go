@@ -1,6 +1,8 @@
 package business
 
 import (
+	"ai-powered-study-planner-backend/internal/tasks/entity"
+	"ai-powered-study-planner-backend/internal/tasks/repo"
 	"ai-powered-study-planner-backend/pkg/auth"
 	"ai-powered-study-planner-backend/pkg/errors"
 	"context"
@@ -8,6 +10,8 @@ import (
 	"fmt"
 	"log"
 	"time"
+
+	"github.com/samber/lo"
 )
 
 func (b *LLMsBusiness) AnalyzeScheduledTasks(ctx context.Context) (*string, error) {
@@ -16,8 +20,11 @@ func (b *LLMsBusiness) AnalyzeScheduledTasks(ctx context.Context) (*string, erro
 		return nil, errors.ErrUserUnauthorized
 	}
 
-	// Get all tasks of users
-	tasks, err := b.TasksRepo.GetTasksByFirebaseUID(firebaseProfile.UID, nil, nil)
+	// Get all tasks of users which have status not started
+	tasks, err := b.TasksRepo.GetTasksByFirebaseUID(firebaseProfile.UID, &repo.TaskFilter{
+		StartTime: lo.ToPtr(time.Now()),
+		Status:    lo.ToPtr(entity.NotStarted),
+	})
 	if err != nil {
 		return nil, nil
 	}
@@ -35,7 +42,7 @@ func (b *LLMsBusiness) AnalyzeScheduledTasks(ctx context.Context) (*string, erro
 
 	question := fmt.Sprintf(
 		`Here is my task list in JSON format: %s. 
-		Can you analyze my schedule and provide suggestions for improvements? Please include the following in your response:
+		Can you analyze my schedule in future and provide suggestions for improvements? Please include the following in your response:
 		1. A warning if my schedule is too tight or may lead to burnout.
 		2. Recommendations for prioritizing tasks to improve focus and balance.
 		3. Any other suggestions to optimize my time management and avoid overloading.

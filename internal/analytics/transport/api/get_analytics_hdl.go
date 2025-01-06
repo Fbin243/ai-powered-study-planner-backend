@@ -6,11 +6,18 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 )
 
 func (api *AnalyticsAPI) GetAnalytics(c *gin.Context) {
 	var filter dto.DateTimeFilter
 	if err := c.ShouldBindJSON(&filter); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	validate := validator.New()
+	if err := validate.Struct(filter); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}

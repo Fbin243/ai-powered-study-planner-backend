@@ -8,18 +8,29 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-func (r *TasksRepo) GetTasksByFirebaseUID(firebaseUID string, startTime *time.Time, endTime *time.Time) ([]entity.Task, error) {
+type TaskFilter struct {
+	StartTime *time.Time
+	EndTime   *time.Time
+	Status    *entity.TaskStatus
+}
+
+func (r *TasksRepo) GetTasksByFirebaseUID(firebaseUID string, taskFilter *TaskFilter) ([]entity.Task, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	filter := bson.M{"firebase_uid": firebaseUID}
-	if startTime != nil {
-		filter["start_time"] = bson.M{"$gte": *startTime}
+	if taskFilter != nil {
+		if taskFilter.StartTime != nil {
+			filter["start_date"] = bson.M{"$gte": *taskFilter.StartTime}
+		}
+		if taskFilter.EndTime != nil {
+			filter["end_date"] = bson.M{"$lte": *taskFilter.EndTime}
+		}
+		if taskFilter.Status != nil {
+			filter["status"] = *taskFilter.Status
+		}
 	}
-	if endTime != nil {
-		filter["end_time"] = bson.M{"$lte": *endTime}
-	}
-	
+
 	tasks := []entity.Task{}
 	cursor, err := r.Collection.Find(ctx, filter)
 	if err != nil {

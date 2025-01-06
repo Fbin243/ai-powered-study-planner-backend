@@ -17,7 +17,7 @@ func (b *TasksBusiness) GetTasks(ctx context.Context) ([]entity.Task, error) {
 		return nil, errors.ErrUserUnauthorized
 	}
 
-	tasks, err := b.TasksRepo.GetTasksByFirebaseUID(firebaseProfile.UID, nil, nil)
+	tasks, err := b.TasksRepo.GetTasksByFirebaseUID(firebaseProfile.UID, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -35,7 +35,7 @@ func (b *TasksBusiness) GetTasks(ctx context.Context) ([]entity.Task, error) {
 			} else if task.EndDate.Before(currentTime) &&
 				task.Status != entity.Expired {
 				task.Status = entity.Expired
-				needToUpdate = false
+				needToUpdate = true
 			}
 
 			if needToUpdate {

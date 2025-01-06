@@ -4,6 +4,7 @@ import (
 	"ai-powered-study-planner-backend/internal/analytics/entity"
 	"ai-powered-study-planner-backend/internal/analytics/transport/dto"
 	tasksEntity "ai-powered-study-planner-backend/internal/tasks/entity"
+	"ai-powered-study-planner-backend/internal/tasks/repo"
 	timtracksEntity "ai-powered-study-planner-backend/internal/timetracks/entity"
 	"ai-powered-study-planner-backend/pkg/auth"
 	"ai-powered-study-planner-backend/pkg/errors"
@@ -25,7 +26,10 @@ func (b *AnalyticsBusiness) GetAnalytics(ctx context.Context, dateFilter *dto.Da
 	}
 
 	// Get all tasks of user
-	tasks, err := b.TasksRepo.GetTasksByFirebaseUID(firebaseProfile.UID, dateFilter.StartTime, dateFilter.EndTime)
+	tasks, err := b.TasksRepo.GetTasksByFirebaseUID(firebaseProfile.UID, &repo.TaskFilter{
+		StartTime: dateFilter.StartTime,
+		EndTime:   dateFilter.EndTime,
+	})
 	if err != nil {
 		return nil, err
 	}
