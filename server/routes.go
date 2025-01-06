@@ -48,7 +48,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r.GET("/timetracks", timetracksApi.GetCurrentTimetrack)
 	r.POST("/timetracks", timetracksApi.UpsertTimetrack)
 	// Analytics
-	r.GET("/analytics", analyticsApi.GetAnalytics)
+	r.POST("/analytics", analyticsApi.GetAnalytics)
 	return r
 }
 
