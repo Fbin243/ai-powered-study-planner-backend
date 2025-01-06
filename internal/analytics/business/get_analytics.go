@@ -33,6 +33,8 @@ func (b *AnalyticsBusiness) GetAnalytics(ctx context.Context, dateFilter *dto.Da
 		if err != nil {
 			return nil, err
 		}
+
+		return analytics, nil
 	} else if err != redis.Nil {
 		return nil, err
 	}
