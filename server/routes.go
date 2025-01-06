@@ -34,19 +34,25 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r.GET("/", s.HelloWorldHandler)
 	r.GET("/health", s.healthHandler)
 	r.Use(authMiddleware.CheckAuth)
+
 	// Profiles
 	r.GET("/profile", profilesApi.GetProfile)
 	r.POST("/profile", profilesApi.UpdateProfile)
+
 	// Tasks
 	r.GET("/tasks", tasksApi.GetTasks)
 	r.GET("/tasks/:id", tasksApi.GetTask)
 	r.POST("/tasks", tasksApi.UpsertTask)
 	r.DELETE("/tasks/:id", tasksApi.DeleteTask)
+
 	// LLMs
 	r.GET("/llms/tasks", llmsApi.AnalyzeScheduledTasks)
+	r.POST("/llms/analytics", llmsApi.GiveFeedbacks)
+
 	// Timetracks
 	r.GET("/timetracks", timetracksApi.GetCurrentTimetrack)
 	r.POST("/timetracks", timetracksApi.UpsertTimetrack)
+
 	// Analytics
 	r.POST("/analytics", analyticsApi.GetAnalytics)
 	return r

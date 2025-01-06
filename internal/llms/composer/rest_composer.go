@@ -4,12 +4,14 @@ import (
 	"ai-powered-study-planner-backend/internal/llms/business"
 	"ai-powered-study-planner-backend/internal/llms/transport/api"
 	"ai-powered-study-planner-backend/internal/tasks/repo"
+	timetracksRepo "ai-powered-study-planner-backend/internal/timetracks/repo"
 	"ai-powered-study-planner-backend/pkg/db"
 )
 
 func ComposeLLMsAPI() *api.LLMsAPI {
 	tasksRepo := repo.NewTasksRepo(db.New().GetCollection(db.TasksCollection))
-	llmsBusiness := business.NewLLMsBusiness(tasksRepo)
+	timetracksRepo := timetracksRepo.NewTimetracksRepo(db.New().GetCollection(db.TimeTracksCollection))
+	llmsBusiness := business.NewLLMsBusiness(tasksRepo, timetracksRepo)
 
 	return api.NewLLMsAPI(llmsBusiness)
 }
