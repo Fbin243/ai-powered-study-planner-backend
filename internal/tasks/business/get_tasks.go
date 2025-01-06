@@ -5,7 +5,9 @@ import (
 	"ai-powered-study-planner-backend/pkg/auth"
 	"ai-powered-study-planner-backend/pkg/errors"
 	"context"
+	"time"
 
+	"github.com/samber/lo"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -15,7 +17,36 @@ func (b *TasksBusiness) GetTasks(ctx context.Context) ([]entity.Task, error) {
 		return nil, errors.ErrUserUnauthorized
 	}
 
-	return b.TasksRepo.GetTasksByFirebaseUID(firebaseProfile.UID, nil, nil)
+	tasks, err := b.TasksRepo.GetTasksByFirebaseUID(firebaseProfile.UID, nil, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	// Keep the status of task up to current date
+	tasks = lo.Map(tasks, func(task entity.Task, _ int) entity.Task {
+		if task.Status != entity.Expired && task.Status != entity.Completed {
+			currentTime := time.Now()
+			needToUpdate := false
+			if task.StartDate.Before(currentTime) &&
+				task.EndDate.After(currentTime) &&
+				task.Status != entity.InProgress {
+				task.Status = entity.InProgress
+				needToUpdate = true
+			} else if task.EndDate.Before(currentTime) &&
+				task.Status != entity.Expired {
+				task.Status = entity.Expired
+				needToUpdate = false
+			}
+
+			if needToUpdate {
+				b.TasksRepo.UpdateById(task.ID, &task)
+			}
+		}
+
+		return task
+	})
+
+	return tasks, nil
 }
 
 func (b *TasksBusiness) GetTaskByID(ctx context.Context, taskID string) (*entity.Task, error) {
