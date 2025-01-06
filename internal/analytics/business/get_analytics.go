@@ -7,9 +7,14 @@ import (
 	"ai-powered-study-planner-backend/internal/tasks/repo"
 	timtracksEntity "ai-powered-study-planner-backend/internal/timetracks/entity"
 	"ai-powered-study-planner-backend/pkg/auth"
+	"ai-powered-study-planner-backend/pkg/db"
 	"ai-powered-study-planner-backend/pkg/errors"
 	"context"
+	"encoding/json"
+	"fmt"
+	"time"
 
+	"github.com/redis/go-redis/v9"
 	"github.com/samber/lo"
 )
 
@@ -17,6 +22,19 @@ func (b *AnalyticsBusiness) GetAnalytics(ctx context.Context, dateFilter *dto.Da
 	firebaseProfile, ok := ctx.Value(auth.ProfileKey).(*auth.FirebaseProfile)
 	if !ok {
 		return nil, errors.ErrUserUnauthorized
+	}
+
+	analytics := &entity.Analytic{}
+
+	// Get cache from redis
+	analyticJSON, err := b.RedisClient.Get(ctx, db.AnalyticsKey(firebaseProfile.UID)).Result()
+	if err == nil {
+		err = json.Unmarshal([]byte(analyticJSON), analytics)
+		if err != nil {
+			return nil, err
+		}
+	} else if err != redis.Nil {
+		return nil, err
 	}
 
 	// Get all timetracks of user
@@ -34,11 +52,9 @@ func (b *AnalyticsBusiness) GetAnalytics(ctx context.Context, dateFilter *dto.Da
 		return nil, err
 	}
 
-	analytics := &entity.Analytic{
-		FirebaseUID: firebaseProfile.UID,
-		Timetracks:  timetracks,
-		TotalTasks:  int32(len(tasks)),
-	}
+	analytics.FirebaseUID = firebaseProfile.UID
+	analytics.Timetracks = timetracks
+	analytics.TotalTasks = int32(len(tasks))
 
 	// Total focus time
 	analytics.TotalFocusTime = lo.Reduce(timetracks, func(agg int32, timetrack timtracksEntity.Timetrack, _ int) int32 {
@@ -76,6 +92,19 @@ func (b *AnalyticsBusiness) GetAnalytics(ctx context.Context, dateFilter *dto.Da
 			analytics.TaskDistribution.NotStarted++
 		}
 	}
+
+	// Set analytics to redis
+	JSON, err := json.Marshal(analytics)
+	if err != nil {
+		return nil, err
+	}
+
+	err = b.RedisClient.Set(ctx, db.AnalyticsKey(analytics.FirebaseUID), JSON, time.Hour).Err()
+	if err != nil {
+		return nil, err
+	}
+
+	fmt.Printf("redis")
 
 	return analytics, nil
 }

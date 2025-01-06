@@ -9,7 +9,7 @@ import (
 
 func ComposeTasksAPI() *api.TasksAPI {
 	tasksRepo := repo.NewTasksRepo(db.New().GetCollection(db.TasksCollection))
-	tasksBusiness := business.NewTasksBusiness(tasksRepo)
+	tasksBusiness := business.NewTasksBusiness(tasksRepo, db.GetRedisClient())
 
 	return api.NewTasksAPI(tasksBusiness)
 }

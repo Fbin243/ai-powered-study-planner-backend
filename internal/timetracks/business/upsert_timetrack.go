@@ -97,6 +97,17 @@ func (b *TimetracksBusiness) UpsertTimetrack(ctx context.Context, timetrack *dto
 		}
 	}
 
+	// Invalidate caching
+	err := b.RedisClient.HDel(ctx, db.AIFeedbackKey(firebaseProfile.UID)).Err()
+	if err != nil {
+		return nil, err
+	}
+	
+	err = b.RedisClient.HDel(ctx, db.AnalyticsKey(firebaseProfile.UID)).Err()
+	if err != nil {
+		return nil, err
+	}
+
 	return upsertTimetrack, nil
 }
 

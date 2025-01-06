@@ -11,7 +11,7 @@ import (
 func ComposeLLMsAPI() *api.LLMsAPI {
 	tasksRepo := repo.NewTasksRepo(db.New().GetCollection(db.TasksCollection))
 	timetracksRepo := timetracksRepo.NewTimetracksRepo(db.New().GetCollection(db.TimeTracksCollection))
-	llmsBusiness := business.NewLLMsBusiness(tasksRepo, timetracksRepo)
+	llmsBusiness := business.NewLLMsBusiness(tasksRepo, timetracksRepo, db.GetRedisClient())
 
 	return api.NewLLMsAPI(llmsBusiness)
 }

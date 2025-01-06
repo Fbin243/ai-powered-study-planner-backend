@@ -9,6 +9,7 @@ import (
 	"syscall"
 	"time"
 
+	"ai-powered-study-planner-backend/pkg/db"
 	"ai-powered-study-planner-backend/server"
 )
 
@@ -44,7 +45,7 @@ func main() {
 
 	// Run graceful shutdown in a separate goroutine
 	go gracefulShutdown(server, done)
-
+	db.GetRedisClient()
 	err := server.ListenAndServe()
 	if err != nil && err != http.ErrServerClosed {
 		panic(fmt.Sprintf("http server error: %s", err))

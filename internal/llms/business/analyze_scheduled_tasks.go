@@ -4,6 +4,7 @@ import (
 	"ai-powered-study-planner-backend/internal/tasks/entity"
 	"ai-powered-study-planner-backend/internal/tasks/repo"
 	"ai-powered-study-planner-backend/pkg/auth"
+	"ai-powered-study-planner-backend/pkg/db"
 	"ai-powered-study-planner-backend/pkg/errors"
 	"context"
 	"encoding/json"
@@ -11,6 +12,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/redis/go-redis/v9"
 	"github.com/samber/lo"
 )
 
@@ -18,6 +20,14 @@ func (b *LLMsBusiness) AnalyzeScheduledTasks(ctx context.Context) (*string, erro
 	firebaseProfile, ok := ctx.Value(auth.ProfileKey).(*auth.FirebaseProfile)
 	if !ok {
 		return nil, errors.ErrUserUnauthorized
+	}
+
+	// Get analyze result from redis
+	cachedAnswer, err := b.RedisClient.Get(ctx, db.AIAnalyzeKey(firebaseProfile.UID)).Result()
+	if err == nil {
+		return &cachedAnswer, nil
+	} else if err != redis.Nil {
+		return nil, err
 	}
 
 	// Get all tasks of users which have status not started
@@ -53,6 +63,17 @@ func (b *LLMsBusiness) AnalyzeScheduledTasks(ctx context.Context) (*string, erro
 	answer := b.Chat(question)
 	if answer == nil {
 		return nil, fmt.Errorf("error analyzing tasks, please try again later")
+	}
+
+	// Save answer to redis
+	analyzeRes, err := json.Marshal(answer)
+	if err != nil {
+		return nil, err
+	}
+
+	err = b.RedisClient.Set(ctx, db.AIAnalyzeKey(firebaseProfile.UID), analyzeRes, time.Hour).Err()
+	if err != nil {
+		return nil, err
 	}
 
 	return answer, nil

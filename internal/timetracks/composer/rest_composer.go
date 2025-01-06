@@ -11,7 +11,7 @@ import (
 func ComposeTimetracksAPI() *api.TimetracksAPI {
 	timetracksRepo := repo.NewTimetracksRepo(db.New().GetCollection(db.TimeTracksCollection))
 	tasksRepo := tasksRepo.NewTasksRepo(db.New().GetCollection(db.TasksCollection))
-	timetracksBusiness := business.NewTimetracksBusiness(timetracksRepo, tasksRepo)
+	timetracksBusiness := business.NewTimetracksBusiness(timetracksRepo, tasksRepo, db.GetRedisClient())
 
 	return api.NewTimetracksAPI(timetracksBusiness)
 }

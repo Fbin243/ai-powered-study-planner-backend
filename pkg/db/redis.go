@@ -3,7 +3,9 @@ package db
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
+	"sync"
 
 	"github.com/redis/go-redis/v9"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -12,21 +14,33 @@ import (
 var (
 	redisClient *redis.Client
 	ctx         = context.Background()
+	onceRedis   sync.Once
 )
 
 const (
-	AuthSessionKey    = "auth_session_"
-	CapturedRecordKey = "captured_record_"
-	FishKey           = "fish_"
-	TimeTrackingKey   = "time_tracking_"
+	analytics   = "analytics_"
+	ai_analyze  = "ai_analyze_"
+	ai_feedback = "ai_feedback_"
 )
+
+func AnalyticsKey(firebaseUID string) string {
+	return analytics + firebaseUID
+}
+
+func AIAnalyzeKey(firebaseUID string) string {
+	return ai_analyze + firebaseUID
+}
+
+func AIFeedbackKey(firebaseUID string) string {
+	return ai_feedback + firebaseUID
+}
 
 type AuthSession struct {
 	ProfileID primitive.ObjectID
 }
 
 func GetRedisClient() *redis.Client {
-	once.Do(func() {
+	onceRedis.Do(func() {
 		initRedis()
 	})
 	return redisClient
@@ -49,21 +63,5 @@ func initRedis() {
 	if err != nil {
 		panic(fmt.Sprintf("Failed to connect to Redis: %v", err))
 	}
-	fmt.Println("Redis connected:", pong)
-}
-
-func GetCapturedRecordKey(profileID string) string {
-	return CapturedRecordKey + profileID
-}
-
-func GetFishKey(profileID string) string {
-	return FishKey + profileID
-}
-
-func GetAuthSessionKey(firebaseUID string) string {
-	return AuthSessionKey + firebaseUID
-}
-
-func GetTimeTrackingKey(profileID string) string {
-	return TimeTrackingKey + profileID
+	log.Println("Redis connected:", pong)
 }

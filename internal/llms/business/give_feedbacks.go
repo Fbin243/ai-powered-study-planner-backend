@@ -4,18 +4,29 @@ import (
 	"ai-powered-study-planner-backend/internal/analytics/transport/dto"
 	"ai-powered-study-planner-backend/internal/tasks/repo"
 	"ai-powered-study-planner-backend/pkg/auth"
+	"ai-powered-study-planner-backend/pkg/db"
 	"ai-powered-study-planner-backend/pkg/errors"
 	"context"
 	"encoding/json"
 	"fmt"
 	"log"
 	"time"
+
+	"github.com/redis/go-redis/v9"
 )
 
 func (b *LLMsBusiness) GiveFeedbacks(ctx context.Context, dateTimeFilter *dto.DateTimeFilter) (*string, error) {
 	firebaseProfile, ok := ctx.Value(auth.ProfileKey).(*auth.FirebaseProfile)
 	if !ok {
 		return nil, errors.ErrUserUnauthorized
+	}
+
+	// Get analyze result from redis
+	cachedAnswer, err := b.RedisClient.Get(ctx, db.AIFeedbackKey(firebaseProfile.UID)).Result()
+	if err == nil {
+		return &cachedAnswer, nil
+	} else if err != redis.Nil {
+		return nil, err
 	}
 
 	// Get all tasks of users from start time to end time
@@ -62,6 +73,17 @@ func (b *LLMsBusiness) GiveFeedbacks(ctx context.Context, dateTimeFilter *dto.Da
 	answer := b.Chat(question)
 	if answer == nil {
 		return nil, fmt.Errorf("error analyzing tasks, please try again later")
+	}
+
+	// Save answer to redis
+	feedback, err := json.Marshal(answer)
+	if err != nil {
+		return nil, err
+	}
+
+	err = b.RedisClient.Set(ctx, db.AIFeedbackKey(firebaseProfile.UID), feedback, time.Hour).Err()
+	if err != nil {
+		return nil, err
 	}
 
 	return answer, nil
