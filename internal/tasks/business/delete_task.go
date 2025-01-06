@@ -3,6 +3,7 @@ package business
 import (
 	"ai-powered-study-planner-backend/internal/tasks/entity"
 	"ai-powered-study-planner-backend/pkg/auth"
+	"ai-powered-study-planner-backend/pkg/db"
 	"ai-powered-study-planner-backend/pkg/errors"
 	"context"
 
@@ -31,6 +32,22 @@ func (b *TasksBusiness) DeleteTask(ctx context.Context, taskID string) (*entity.
 	// Check if the user is authorized to delete the task
 	if task.FirebaseUID != firebaseProfile.UID {
 		return nil, errors.ErrUserUnauthorized
+	}
+
+	// Invalidate caching
+	err = b.RedisClient.Del(ctx, db.AIAnalyzeKey(firebaseProfile.UID)).Err()
+	if err != nil {
+		return nil, err
+	}
+
+	err = b.RedisClient.Del(ctx, db.AIFeedbackKey(firebaseProfile.UID)).Err()
+	if err != nil {
+		return nil, err
+	}
+
+	err = b.RedisClient.Del(ctx, db.AnalyticsKey(firebaseProfile.UID)).Err()
+	if err != nil {
+		return nil, err
 	}
 
 	return b.TasksRepo.DeleteById(oid)

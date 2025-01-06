@@ -54,6 +54,8 @@ func (b *AnalyticsBusiness) GetAnalytics(ctx context.Context, dateFilter *dto.Da
 		return nil, err
 	}
 
+	fmt.Printf("tasks: %v", tasks)
+
 	analytics.FirebaseUID = firebaseProfile.UID
 	analytics.Timetracks = timetracks
 	analytics.TotalTasks = int32(len(tasks))
