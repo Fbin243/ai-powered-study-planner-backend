@@ -46,7 +46,7 @@ func (b *LLMsBusiness) AnalyzeScheduledTasks(ctx context.Context) (*string, erro
 		1. A warning if my schedule is too tight or may lead to burnout.
 		2. Recommendations for prioritizing tasks to improve focus and balance.
 		3. Any other suggestions to optimize my time management and avoid overloading.
-		Please answer shortly under 300 tokens and return in Markdown format (Trim the markdown block code).`,
+		Please answer shortly under 300 tokens and return in Markdown format (Trim the markdown block code, just return the answer only.).`,
 		string(dataJSON),
 	)
 

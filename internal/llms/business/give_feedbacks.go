@@ -55,7 +55,7 @@ func (b *LLMsBusiness) GiveFeedbacks(ctx context.Context, dateTimeFilter *dto.Da
 		1. Identifying areas where I'm excelling.
 		2. Suggesting subjects or tasks that may need more attention.
 		3. Offering motivational feedback to encourage consistency and improvement.
-		Please answer shortly under 300 tokens and return in Markdown format (Trim the markdown block code).`,
+		Please answer shortly under 300 tokens and return in Markdown format (Trim the markdown block code, just return the answer only.).`,
 		string(dataJSON),
 	)
 
