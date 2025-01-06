@@ -64,17 +64,17 @@ func (b *TasksBusiness) UpsertTask(ctx context.Context, task *dto.TaskDto) (*ent
 	}
 
 	// Invalidate caching
-	err := b.RedisClient.HDel(ctx, db.AIAnalyzeKey(firebaseProfile.UID)).Err()
+	err := b.RedisClient.Del(ctx, db.AIAnalyzeKey(firebaseProfile.UID)).Err()
 	if err != nil {
 		return nil, err
 	}
 
-	err = b.RedisClient.HDel(ctx, db.AIFeedbackKey(firebaseProfile.UID)).Err()
+	err = b.RedisClient.Del(ctx, db.AIFeedbackKey(firebaseProfile.UID)).Err()
 	if err != nil {
 		return nil, err
 	}
 
-	err = b.RedisClient.HDel(ctx, db.AnalyticsKey(firebaseProfile.UID)).Err()
+	err = b.RedisClient.Del(ctx, db.AnalyticsKey(firebaseProfile.UID)).Err()
 	if err != nil {
 		return nil, err
 	}
