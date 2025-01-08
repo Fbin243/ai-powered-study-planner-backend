@@ -98,12 +98,12 @@ func (b *TimetracksBusiness) UpsertTimetrack(ctx context.Context, timetrack *dto
 	}
 
 	// Invalidate caching
-	err := b.RedisClient.Del(ctx, db.AIFeedbackKey(firebaseProfile.UID)).Err()
+	err := db.DeleteKeysByPattern(ctx, b.RedisClient, db.AIFeedbackKey(firebaseProfile.UID, nil, nil))
 	if err != nil {
 		return nil, err
 	}
 
-	err = b.RedisClient.Del(ctx, db.AnalyticsKey(firebaseProfile.UID)).Err()
+	err = db.DeleteKeysByPattern(ctx, b.RedisClient, db.AnalyticsKey(firebaseProfile.UID, nil, nil))
 	if err != nil {
 		return nil, err
 	}

@@ -27,7 +27,7 @@ func (b *AnalyticsBusiness) GetAnalytics(ctx context.Context, dateFilter *dto.Da
 	analytics := &entity.Analytic{}
 
 	// Get cache from redis
-	analyticJSON, err := b.RedisClient.Get(ctx, db.AnalyticsKey(firebaseProfile.UID)).Result()
+	analyticJSON, err := b.RedisClient.Get(ctx, db.AnalyticsKey(firebaseProfile.UID, dateFilter.StartTime, dateFilter.EndTime)).Result()
 	if err == nil {
 		err = json.Unmarshal([]byte(analyticJSON), analytics)
 		if err != nil {
@@ -103,12 +103,10 @@ func (b *AnalyticsBusiness) GetAnalytics(ctx context.Context, dateFilter *dto.Da
 		return nil, err
 	}
 
-	err = b.RedisClient.Set(ctx, db.AnalyticsKey(analytics.FirebaseUID), JSON, time.Hour).Err()
+	err = b.RedisClient.Set(ctx, db.AnalyticsKey(analytics.FirebaseUID, dateFilter.StartTime, dateFilter.EndTime), JSON, time.Hour).Err()
 	if err != nil {
 		return nil, err
 	}
-
-	fmt.Printf("redis")
 
 	return analytics, nil
 }

@@ -22,7 +22,7 @@ func (b *LLMsBusiness) GiveFeedbacks(ctx context.Context, dateTimeFilter *dto.Da
 	}
 
 	// Get analyze result from redis
-	cachedAnswer, err := b.RedisClient.Get(ctx, db.AIFeedbackKey(firebaseProfile.UID)).Result()
+	cachedAnswer, err := b.RedisClient.Get(ctx, db.AIFeedbackKey(firebaseProfile.UID, dateTimeFilter.StartTime, dateTimeFilter.EndTime)).Result()
 	if err == nil {
 		return &cachedAnswer, nil
 	} else if err != redis.Nil {
@@ -75,7 +75,7 @@ func (b *LLMsBusiness) GiveFeedbacks(ctx context.Context, dateTimeFilter *dto.Da
 		return nil, fmt.Errorf("error analyzing tasks, please try again later")
 	}
 
-	err = b.RedisClient.Set(ctx, db.AIFeedbackKey(firebaseProfile.UID), answer, time.Hour).Err()
+	err = b.RedisClient.Set(ctx, db.AIFeedbackKey(firebaseProfile.UID, dateTimeFilter.StartTime, dateTimeFilter.EndTime), answer, time.Hour).Err()
 	if err != nil {
 		return nil, err
 	}

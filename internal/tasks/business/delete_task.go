@@ -40,12 +40,12 @@ func (b *TasksBusiness) DeleteTask(ctx context.Context, taskID string) (*entity.
 		return nil, err
 	}
 
-	err = b.RedisClient.Del(ctx, db.AIFeedbackKey(firebaseProfile.UID)).Err()
+	err = db.DeleteKeysByPattern(ctx, b.RedisClient, db.AIFeedbackKey(task.FirebaseUID, nil, nil))
 	if err != nil {
 		return nil, err
 	}
 
-	err = b.RedisClient.Del(ctx, db.AnalyticsKey(firebaseProfile.UID)).Err()
+	err = db.DeleteKeysByPattern(ctx, b.RedisClient, db.AnalyticsKey(task.FirebaseUID, nil, nil))
 	if err != nil {
 		return nil, err
 	}
