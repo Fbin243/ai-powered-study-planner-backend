@@ -52,11 +52,12 @@ func (b *LLMsBusiness) AnalyzeScheduledTasks(ctx context.Context) (*string, erro
 
 	question := fmt.Sprintf(
 		`Here is my task list in JSON format: %s. 
-		Can you analyze my schedule in future and provide suggestions for improvements? Please include the following in your response:
-		1. A warning if my schedule is too tight or may lead to burnout.
-		2. Recommendations for prioritizing tasks to improve focus and balance.
-		3. Any other suggestions to optimize my time management and avoid overloading.
-		Please answer shortly under 300 tokens and return in Markdown format (Trim the markdown block code, just return the answer only.).`,
+		Can you analyze my schedule and provide specific feedback for each task, focusing on:
+		1. Any potential conflicts or overlaps in timing and how to resolve them.
+		2. Recommendations for prioritizing tasks based on their urgency, importance, and current progress.
+		3. Suggestions for improving time allocation and avoiding burnout for tasks with tight deadlines or long durations.
+		4. Any other personalized tips to enhance my overall time management.
+		Please answer concisely under 300 tokens and return in Markdown format (trim the block code, return the content only).`,
 		string(dataJSON),
 	)
 

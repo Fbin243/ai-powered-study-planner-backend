@@ -59,14 +59,15 @@ func (b *LLMsBusiness) GiveFeedbacks(ctx context.Context, dateTimeFilter *dto.Da
 		log.Fatalf("Error marshalling tasks: %v", err)
 	}
 
+	// Prepare the question prompt for the LLM
 	question := fmt.Sprintf(
-		`Here is my task list and their timetracks (reference through task_id) in JSON format: %s. 
-		Can you give me some feedbacks based on my focus and break time for my tasks?
-		AI feedback:
-		1. Identifying areas where I'm excelling.
-		2. Suggesting subjects or tasks that may need more attention.
-		3. Offering motivational feedback to encourage consistency and improvement.
-		Please answer shortly under 300 tokens and return in Markdown format (Trim the markdown block code, just return the answer only.).`,
+		`Here is my task list and their corresponding timetracks (linked via task_id) in JSON format: %s. 
+		Can you analyze my task focus and break times and provide specific feedback? 
+		Please include:
+		1. Areas where I am performing well or showing consistency.
+		2. Tasks or areas that may need more attention or adjustments.
+		3. Motivational tips to maintain focus and improve time management.
+		Answer concisely in under 300 tokens and format your response in Markdown (trim the block code, return the content only).`,
 		string(dataJSON),
 	)
 
