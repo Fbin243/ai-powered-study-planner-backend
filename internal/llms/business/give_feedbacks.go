@@ -75,13 +75,7 @@ func (b *LLMsBusiness) GiveFeedbacks(ctx context.Context, dateTimeFilter *dto.Da
 		return nil, fmt.Errorf("error analyzing tasks, please try again later")
 	}
 
-	// Save answer to redis
-	feedback, err := json.Marshal(answer)
-	if err != nil {
-		return nil, err
-	}
-
-	err = b.RedisClient.Set(ctx, db.AIFeedbackKey(firebaseProfile.UID), feedback, time.Hour).Err()
+	err = b.RedisClient.Set(ctx, db.AIFeedbackKey(firebaseProfile.UID), answer, time.Hour).Err()
 	if err != nil {
 		return nil, err
 	}
