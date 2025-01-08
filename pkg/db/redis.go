@@ -87,7 +87,7 @@ func DeleteKeysByPattern(ctx context.Context, rdb *redis.Client, pattern string)
 	var cursor uint64
 	for {
 		// Scan for keys matching the pattern
-		keys, nextCursor, err := rdb.Scan(ctx, cursor, pattern, 100).Result()
+		keys, nextCursor, err := rdb.Scan(ctx, cursor, "*"+pattern+"*", 100).Result()
 		if err != nil {
 			return fmt.Errorf("error scanning keys: %w", err)
 		}
